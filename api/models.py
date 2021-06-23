@@ -9,7 +9,7 @@ class Catalog(models.Model):
 
     # необходимость этого отношение здесь спорно, так как зависят элементы от глобального идентификатора
     # заполняться будет в сериализаторе
-    items = models.ManyToManyField('CatalogItem')
+    items = models.ManyToManyField('CatalogItem', blank=True)
 
     name = models.CharField(max_length=150, blank=True, verbose_name="наименование")
     short_name = models.CharField(max_length=50, blank=True, verbose_name="короткое наименование")
@@ -28,6 +28,7 @@ class Catalog(models.Model):
 
     class Meta:
         verbose_name = "Справочник"
+        verbose_name_plural = "Справочники"
 
         # как я понял, справочники могут обновляться, а идентификатор остается тем же,
         # таким образом версия будет уникальна в пределах справочника
@@ -40,7 +41,7 @@ class CatalogItem(models.Model):
     id = models.AutoField(primary_key=True, verbose_name="идентификатор")
 
     identifier = models.CharField(max_length=50, verbose_name="идентификатор")
-    parent_identifier = models.CharField(max_length=50, verbose_name=" родительский идентификатор")
+    parent_identifier = models.CharField(max_length=50, verbose_name="родительский идентификатор")
 
     code = models.CharField(max_length=50, blank=False, verbose_name="код элемента")
     value = models.CharField(max_length=200, blank=False, verbose_name="значение элемента")
@@ -50,6 +51,7 @@ class CatalogItem(models.Model):
 
     class Meta:
         verbose_name = "Элемент справочника"
+        verbose_name_plural = "Элементы справочников"
 
 
 

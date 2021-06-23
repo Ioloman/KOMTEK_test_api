@@ -1,3 +1,5 @@
 from django.contrib import admin
+from api.models import Catalog, CatalogItem
 
-# Register your models here.
+admin.site.register(Catalog)
+admin.site.register(CatalogItem)
