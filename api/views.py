@@ -3,12 +3,20 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework import generics
-
 from api.models import Catalog, CatalogItem
 from api.serializers import CatalogSerializer, CatalogItemSerializer
+# TODO:
+#  протестировать привязку по связи мэни ту мэни в модели при создании,
+#  сделать документацию,
+#  добавить комменты,
+#  сделать фильтры,
+#  узнать про валидацию, сделать валидацию
 
 
 def redirect_view(request):
+    """
+    Заглушка для переадресации с пустого url на url API
+    """
     return redirect('api:root')
 
 
