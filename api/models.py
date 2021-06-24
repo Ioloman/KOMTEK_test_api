@@ -29,10 +29,13 @@ class Catalog(models.Model):
 
     @classmethod
     def get_by_version(cls, identifier: str, version: Optional[str] = None):
-        if version is None:
-            return cls.objects.filter(identifier=identifier).order_by('-date').first()
-        else:
-            return cls.objects.get(identifier=identifier, version=version)
+        try:
+            if version is None:
+                return cls.objects.filter(identifier=identifier, date__lte=date.today()).latest('date')
+            else:
+                return cls.objects.get(identifier=identifier, version=version)
+        except cls.DoesNotExist:
+            return None
 
     def save(self, *args, **kwargs) -> None:
         """

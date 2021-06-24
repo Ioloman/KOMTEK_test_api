@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework import generics, filters
 
-from api.filters import RelevantDateFilterBackend
+from api.filters import RelevantDateFilterBackend, ExactCatalogFilterBackend
 from api.models import Catalog, CatalogItem
 from api.serializers import CatalogSerializer, CatalogItemSerializer
 # TODO:
@@ -36,7 +36,7 @@ def api_root(request, format=None):
 class CatalogList(generics.ListAPIView):
     queryset = Catalog.objects.all()
     serializer_class = CatalogSerializer
-    # свой фильтр для получения списка справочников, актуальных на указанную дату.
+    # свой фильтр для получения списка справочников, актуальных на указанную дату
     filter_backends = [RelevantDateFilterBackend, filters.OrderingFilter]
     ordering_fields = ['date', 'identifier', 'version']
     ordering = ['-date']
@@ -50,6 +50,10 @@ class CatalogDetail(generics.RetrieveAPIView):
 class CatalogItemList(generics.ListAPIView):
     queryset = CatalogItem.objects.all()
     serializer_class = CatalogItemSerializer
+    # свой фильтр для получения элементов заданного справочника текущей или указанной версии
+    filter_backends = [ExactCatalogFilterBackend, filters.OrderingFilter]
+    ordering_fields = ['parent_identifier']
+    ordering = ['parent_identifier']
 
 
 class CatalogItemDetail(generics.RetrieveAPIView):

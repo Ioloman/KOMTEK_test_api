@@ -1,5 +1,4 @@
 import datetime
-
 from django.db.models import QuerySet, Count
 from rest_framework import filters
 
@@ -28,4 +27,24 @@ class RelevantDateFilterBackend(filters.BaseFilterBackend):
                 relevant_catalog = queryset.filter(identifier=identifier).latest('date')
                 queryset = queryset.exclude(identifier=identifier, date__lt=relevant_catalog.date)
 
+        return queryset
+
+
+class ExactCatalogFilterBackend(filters.BaseFilterBackend):
+    """
+    Фильтр для получения элементов заданного справочника текущей или указанной версии
+    """
+    def filter_queryset(self, request, queryset, view):
+        # определяем есть ли нужный параметр
+        identifier = request.query_params.get('catalog_identifier', None)
+        if identifier:
+            # получаем второй параметр если есть
+            version = request.query_params.get('catalog_version', None)
+            # получаем соответствующий справочник с помощью метода в модели Catalog
+            catalog = Catalog.get_by_version(identifier, version=version)
+            # возвращаем элементы справочника, если он нашелся
+            if catalog:
+                return catalog.items.all()
+            else:
+                return queryset.none()
         return queryset
