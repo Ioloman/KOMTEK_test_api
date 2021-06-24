@@ -10,4 +10,5 @@ urlpatterns = [
     path('catalogs/<int:pk>/', views.CatalogDetail.as_view(), name='catalog-detail'),
     path('catalog-items/', views.CatalogItemList.as_view(), name='catalog-item-list'),
     path('catalog-items/<int:pk>/', views.CatalogItemDetail.as_view(), name='catalog-item-detail'),
+    path('catalog-items/validation/', views.CatalogItemsValidation.as_view(), name='catalog-item-validation')
 ]
