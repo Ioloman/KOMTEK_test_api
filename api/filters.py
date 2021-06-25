@@ -11,7 +11,7 @@ class RelevantDateFilterBackend(filters.BaseFilterBackend):
     """
     def filter_queryset(self, request, queryset: QuerySet, view):
         # определяем есть ли нужный параметр
-        date = request.query_params.get('date_filter', None)
+        date = request.query_params.get('date', None)
         if date:
             # конвертируем дату
             date = datetime.date.fromisoformat(date)
@@ -24,8 +24,11 @@ class RelevantDateFilterBackend(filters.BaseFilterBackend):
             # находим актуальный справочник и убираем из queryset
             # все справочники с таким же идентификатором, кроме найденного
             for identifier in distinct_identifiers:
-                relevant_catalog = queryset.filter(identifier=identifier).latest('date')
-                queryset = queryset.exclude(identifier=identifier, date__lt=relevant_catalog.date)
+                try:
+                    relevant_catalog = queryset.filter(identifier=identifier).latest('date')
+                    queryset = queryset.exclude(identifier=identifier, date__lt=relevant_catalog.date)
+                except queryset.model.DoesNotExist:
+                    queryset = queryset.exclude(identifier=identifier)
 
         return queryset
 

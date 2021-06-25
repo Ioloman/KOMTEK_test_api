@@ -18,7 +18,7 @@ class Catalog(models.Model):
     version = models.CharField(max_length=20, verbose_name="версия")
 
     # решил использовать default вместо auto_now_add,
-    # потому что не знаю как будет выбираться дата начала действия
+    # потому что не знаю как должна выбираться дата начала действия
     date = models.DateField(
         default=date.today,
         verbose_name="дата начала действия справочника этой версии"
@@ -29,7 +29,17 @@ class Catalog(models.Model):
 
     @classmethod
     def get_by_version(cls, identifier: str, version: Optional[str] = None):
+        """
+        Метод для поиска указанной версии справочника.
+        Если версия не указана или None, то возвращается текущая версия.
+        :param identifier: идентификатор справочника
+        :param version: версия
+        :return: Объект Catalog
+        """
         try:
+            # для нахождения текущего справочника, сначала отбрасываются документы с датой
+            # больше сегодняшней (не знаю возможно ли такое, сделал на всякий случай),
+            # затем из этого берется самая поздняя дата
             if version is None:
                 return cls.objects.filter(identifier=identifier, date__lte=date.today()).latest('date')
             else:
@@ -53,9 +63,11 @@ class Catalog(models.Model):
             latest = self.get_by_version(self.identifier)
             # сначала нужно сохранить
             super().save(*args, **kwargs)
-            # добавляем элементы
+            # добавляем элементы, у которых соответствует родительский
+            # идентификатор, если нет предыдущей версии справочника
             if latest is None:
                 self.items.add(*CatalogItem.objects.filter(parent_identifier=self.identifier))
+            # добавляем элементы из предыдушей версии справочника
             else:
                 self.items.add(*latest.items.all())
         else:
